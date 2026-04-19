@@ -2,6 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { TablesUpdate } from '@/types/database.types'
 
 export async function createCategory(formData: FormData) {
   const supabase = await createClient()
@@ -57,7 +58,7 @@ export async function updateCategory(id: string, formData: FormData) {
   const name = formData.get('name') as string
   const image = formData.get('image') as File | null
 
-  const updateData: Record<string, string> = {}
+  const updateData: TablesUpdate<'categories'> = {}
   if (name) updateData.name = name
 
   if (image && image.size > 0) {

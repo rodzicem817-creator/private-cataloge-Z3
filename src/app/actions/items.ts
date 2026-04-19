@@ -2,6 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { TablesUpdate } from '@/types/database.types'
 
 export async function createItem(categoryId: string, formData: FormData) {
   const supabase = await createClient()
@@ -78,7 +79,7 @@ export async function updateItem(id: string, categoryId: string, formData: FormD
   const image = formData.get('image') as File | null
   const barcode = formData.get('barcode') as File | null
 
-  const updateData: Record<string, string> = {}
+  const updateData: TablesUpdate<'items'> = {}
   if (name) updateData.name = name
 
   if (image && image.size > 0) {
