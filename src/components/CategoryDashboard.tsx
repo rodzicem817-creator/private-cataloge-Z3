@@ -69,6 +69,7 @@ export function CategoryDashboard({ initialCategories }: { initialCategories: Ca
       )}
 
       <CategoryModal
+        key={editingCategory?.id || 'new'}
         isOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false)

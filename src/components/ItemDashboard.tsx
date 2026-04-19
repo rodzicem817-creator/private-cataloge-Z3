@@ -87,6 +87,7 @@ export function ItemDashboard({ categoryId, categoryName, initialItems }: ItemDa
       )}
 
       <ItemModal
+        key={editingItem?.id || 'new'}
         isOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false)

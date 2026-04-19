@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition, useEffect } from 'react'
+import { useState, useTransition } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Upload, Loader2 } from 'lucide-react'
 import { createCategory, updateCategory } from '@/app/actions/categories'
@@ -14,16 +14,8 @@ interface CategoryModalProps {
 
 export function CategoryModal({ isOpen, onClose, category }: CategoryModalProps) {
   const [isPending, startTransition] = useTransition()
-  const [preview, setPreview] = useState<string | null>(null)
+  const [preview, setPreview] = useState<string | null>(category?.image_url || null)
   const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (category) {
-      setPreview(category.image_url)
-    } else {
-      setPreview(null)
-    }
-  }, [category, isOpen])
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -69,13 +61,13 @@ export function CategoryModal({ isOpen, onClose, category }: CategoryModalProps)
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white dark:bg-[#1C1C1E] rounded-3xl shadow-2xl z-50 overflow-hidden"
           >
-            <div className="flex justify-between items-center p-6 border-b border-neutral-100 dark:border-neutral-800">
-              <h2 className="font-serif text-2xl">
+            <div className="flex justify-between items-center p-6 border-b border-neutral-200 dark:border-neutral-800">
+              <h2 className="font-serif text-2xl font-bold text-black dark:text-white">
                 {category ? 'Edit Collection' : 'New Collection'}
               </h2>
               <button
                 onClick={onClose}
-                className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-black dark:text-white"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -83,7 +75,7 @@ export function CategoryModal({ isOpen, onClose, category }: CategoryModalProps)
 
             <form onSubmit={handleSubmit} className="p-6 space-y-6">
               <div>
-                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                <label className="block text-sm font-bold text-black dark:text-white mb-2">
                   Name
                 </label>
                 <input
@@ -91,16 +83,16 @@ export function CategoryModal({ isOpen, onClose, category }: CategoryModalProps)
                   type="text"
                   required
                   defaultValue={category?.name || ''}
-                  className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100 focus:border-transparent outline-none transition-all"
+                  className="w-full px-4 py-3 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-transparent outline-none transition-all text-black dark:text-white placeholder:text-neutral-400"
                   placeholder="e.g. Summer Collection"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
+                <label className="block text-sm font-bold text-black dark:text-white mb-2">
                   Cover Image
                 </label>
-                <div className="relative group rounded-xl overflow-hidden bg-neutral-50 dark:bg-neutral-900 border-2 border-dashed border-neutral-200 dark:border-neutral-800 aspect-video flex flex-col items-center justify-center hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer">
+                <div className="relative group rounded-xl overflow-hidden bg-neutral-50 dark:bg-neutral-900 border-2 border-dashed border-neutral-300 dark:border-neutral-800 aspect-video flex flex-col items-center justify-center hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer">
                   <input
                     name="image"
                     type="file"
@@ -117,36 +109,37 @@ export function CategoryModal({ isOpen, onClose, category }: CategoryModalProps)
                     />
                   ) : (
                     <div className="text-center p-4">
-                      <Upload className="w-8 h-8 text-neutral-400 mx-auto mb-2" />
-                      <p className="text-sm text-neutral-500">
+                      <Upload className="w-8 h-8 text-neutral-500 mx-auto mb-2" />
+                      <p className="text-sm font-bold text-neutral-600 dark:text-neutral-400">
                         Click or drag to upload
                       </p>
                     </div>
                   )}
                   {preview && (
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity z-10 flex items-center justify-center">
-                      <span className="text-white font-medium">Change Image</span>
+                      <span className="text-white font-bold">Change Image</span>
                     </div>
                   )}
                 </div>
               </div>
 
               {error && (
-                <div className="text-red-500 text-sm">{error}</div>
+                <div className="text-red-700 dark:text-red-400 text-sm font-bold">{error}</div>
               )}
 
               <div className="pt-4 flex justify-end gap-3">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-6 py-2.5 rounded-full font-medium text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                  className="px-6 py-2.5 rounded-full font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
+                  submit-id="category-submit"
                   type="submit"
                   disabled={isPending}
-                  className="px-6 py-2.5 rounded-full font-medium bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center gap-2 hover:opacity-90 disabled:opacity-50 transition-opacity"
+                  className="px-6 py-2.5 rounded-full font-bold bg-black dark:bg-white text-white dark:text-black flex items-center gap-2 hover:opacity-90 disabled:opacity-50 transition-all shadow-lg active:scale-95"
                 >
                   {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
                   {category ? 'Save Changes' : 'Create'}
