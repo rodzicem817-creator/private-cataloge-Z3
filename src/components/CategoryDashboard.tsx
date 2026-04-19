@@ -35,22 +35,22 @@ export function CategoryDashboard({ initialCategories }: { initialCategories: Ca
   return (
     <>
       <div className="flex justify-between items-center mb-8">
-        <h2 className="font-serif text-3xl">Collections</h2>
+        <h2 className="font-serif text-3xl font-bold text-black dark:text-white">Collections</h2>
         <button
           onClick={handleAddNew}
-          className="flex items-center gap-2 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 px-5 py-2.5 rounded-full font-medium text-sm hover:opacity-90 transition-opacity"
+          className="flex items-center gap-2 bg-black dark:bg-white text-white dark:text-black px-6 py-3 rounded-full font-bold text-sm hover:opacity-90 transition-all shadow-lg active:scale-95"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-5 h-5" />
           <span className="hidden sm:inline">New Collection</span>
         </button>
       </div>
 
       {initialCategories.length === 0 ? (
-        <div className="text-center py-24 bg-neutral-50 dark:bg-neutral-900/50 rounded-3xl border border-dashed border-neutral-200 dark:border-neutral-800">
-          <p className="text-neutral-500 dark:text-neutral-400 mb-4">No collections yet.</p>
+        <div className="text-center py-24 bg-white dark:bg-neutral-900/50 rounded-3xl border border-dashed border-neutral-300 dark:border-neutral-800">
+          <p className="text-neutral-600 dark:text-neutral-400 mb-4 font-medium">No collections yet.</p>
           <button
             onClick={handleAddNew}
-            className="text-sm font-medium text-neutral-900 dark:text-white hover:underline"
+            className="text-sm font-bold text-black dark:text-white hover:underline"
           >
             Create your first collection
           </button>

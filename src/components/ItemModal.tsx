@@ -21,14 +21,10 @@ export function ItemModal({ isOpen, onClose, categoryId, item }: ItemModalProps)
 
   useEffect(() => {
     if (item) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setImagePreview(item.image_url)
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setBarcodeName(item.barcode_url ? 'Existing PDF loaded' : null)
     } else {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setImagePreview(null)
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setBarcodeName(null)
     }
   }, [item, isOpen])
