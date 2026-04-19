@@ -2,9 +2,16 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { LogOut } from 'lucide-react'
-import { CategoryDashboard } from '@/components/CategoryDashboard'
+import { ItemDashboard } from '@/components/ItemDashboard'
 
-export default async function Home() {
+interface PageProps {
+  params: Promise<{
+    categoryId: string
+  }>
+}
+
+export default async function CategoryPage({ params }: PageProps) {
+  const { categoryId } = await params
   const supabase = await createClient()
 
   const {
@@ -15,9 +22,23 @@ export default async function Home() {
     redirect('/login')
   }
 
-  const { data: categories } = await supabase
+  // Fetch Category
+  const { data: category } = await supabase
     .from('categories')
     .select('*')
+    .eq('id', categoryId)
+    .eq('user_id', user.id)
+    .single()
+
+  if (!category) {
+    redirect('/')
+  }
+
+  // Fetch Items
+  const { data: items } = await supabase
+    .from('items')
+    .select('*')
+    .eq('category_id', categoryId)
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
 
@@ -44,7 +65,11 @@ export default async function Home() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <CategoryDashboard initialCategories={categories || []} />
+        <ItemDashboard 
+          categoryId={category.id} 
+          categoryName={category.name} 
+          initialItems={items || []} 
+        />
       </main>
     </div>
   )
