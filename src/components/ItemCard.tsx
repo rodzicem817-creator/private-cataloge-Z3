@@ -11,7 +11,8 @@ import {
   ImageIcon, 
   Share, 
   Printer, 
-  ArrowUpRight
+  ArrowUpRight,
+  Loader2
 } from 'lucide-react'
 
 interface Item {
@@ -29,6 +30,7 @@ interface ItemCardProps {
 
 export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isSharing, setIsSharing] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
 
@@ -64,17 +66,37 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
     e.stopPropagation()
     if (!item.barcode_url) return
 
-    if (navigator.share) {
-      try {
+    setIsSharing(true)
+    try {
+      const response = await fetch(item.barcode_url)
+      const blob = await response.blob()
+      const fileName = `${item.name.replace(/\s+/g, '-')}-barcode.pdf`
+      const file = new File([blob], fileName, { type: 'application/pdf' })
+
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: `Barcode for ${item.name}`,
+        })
+      } else if (navigator.share) {
         await navigator.share({
           title: `Barcode for ${item.name}`,
           url: item.barcode_url,
         })
-      } catch (error) {
-        console.error('Error sharing:', error)
+      } else {
+        window.open(item.barcode_url, '_blank')
       }
-    } else {
-      window.open(item.barcode_url, '_blank')
+    } catch (error) {
+      console.error('Error sharing:', error)
+      if (navigator.share) {
+        await navigator.share({
+          title: `Barcode for ${item.name}`,
+          url: item.barcode_url,
+        })
+      }
+    } finally {
+      setIsSharing(false)
+      setIsMenuOpen(false)
     }
   }
 
@@ -138,7 +160,7 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
             onClick={handleMenuToggle}
             className="p-2 rounded-full bg-black/20 hover:bg-black/40 dark:bg-white/10 dark:hover:bg-white/20 backdrop-blur-md transition-colors text-white shadow-sm"
           >
-            <MoreVertical className="w-5 h-5" />
+            {isSharing ? <Loader2 className="w-5 h-5 animate-spin" /> : <MoreVertical className="w-5 h-5" />}
           </button>
 
           <AnimatePresence>
@@ -147,35 +169,35 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
                 initial={{ opacity: 0, scale: 0.95, y: -10 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-[#1C1C1E] rounded-xl shadow-2xl border border-neutral-300 dark:border-neutral-700 overflow-hidden z-[100]"
+                className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-[#1C1C1E] rounded-xl shadow-2xl border border-neutral-300 dark:border-neutral-700 overflow-hidden z-[100]"
               >
                 <div className="p-1.5">
                   {item.barcode_url && (
                     <>
                       <button
                         onClick={handleShare}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-semibold rounded-lg text-neutral-900 dark:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                        className="w-full flex items-center gap-3 px-3 py-3 text-sm font-bold rounded-lg text-black dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
                       >
-                        <Share className="w-4 h-4" /> Share Barcode
+                        <Share className="w-4 h-4 text-neutral-600 dark:text-neutral-400" /> Share to OpenLabel
                       </button>
                       <button
                         onClick={handlePrint}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-semibold rounded-lg text-neutral-900 dark:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                        className="w-full flex items-center gap-3 px-3 py-3 text-sm font-bold rounded-lg text-black dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
                       >
-                        <Printer className="w-4 h-4" /> Print Barcode
+                        <Printer className="w-4 h-4 text-neutral-600 dark:text-neutral-400" /> Print Barcode
                       </button>
                       <hr className="my-1.5 border-neutral-200 dark:border-neutral-800" />
                     </>
                   )}
                   <button
                     onClick={(e) => handleAction(e, () => onEdit(item))}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-semibold rounded-lg text-neutral-900 dark:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                    className="w-full flex items-center gap-3 px-3 py-3 text-sm font-bold rounded-lg text-black dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
                   >
-                    <Edit2 className="w-4 h-4" /> Edit Item
+                    <Edit2 className="w-4 h-4 text-neutral-600 dark:text-neutral-400" /> Edit Item
                   </button>
                   <button
                     onClick={(e) => handleAction(e, () => onDelete(item.id))}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-lg text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                    className="w-full flex items-center gap-3 px-3 py-3 text-sm font-bold rounded-lg text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
                   >
                     <Trash2 className="w-4 h-4" /> Delete Item
                   </button>
