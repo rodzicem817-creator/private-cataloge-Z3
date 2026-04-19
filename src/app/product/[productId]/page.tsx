@@ -78,7 +78,6 @@ export default async function ProductPage({ params }: PageProps) {
           <div className="flex flex-col justify-center">
             <div className="mb-8">
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-neutral-500 mb-2">
-                {/* @ts-expect-error categories is joined */}
                 {item.categories?.name || 'Collection'}
               </p>
               <h1 className="font-serif text-4xl md:text-5xl font-bold text-black dark:text-white mb-4">
